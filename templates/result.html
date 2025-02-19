@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Analysis Result</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        h1, h2 { color: #333; }
+        ul { list-style-type: disc; margin-left: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Analysis Result for: {{ profile }}</h1>
+    <p><strong>Match Score:</strong> {{ result.score }}%</p>
+    
+    <h2>Skills Matched:</h2>
+    <ul>
+        {% for skill in result.matches %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h2>Skills Missing (Suggestions to Add):</h2>
+    <ul>
+        {% for skill in result.missing %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+    </ul>
+    
+    <p><a href="{{ url_for('upload_resume') }}">Analyze another resume</a></p>
+</body>
+</html>
