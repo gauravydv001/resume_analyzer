@@ -4,37 +4,40 @@
     <meta charset="UTF-8">
     <title>Resume Analyzer</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 2em; }
-        label { font-weight: bold; }
+        body { max-width: 800px; margin: 2em auto; padding: 0 1em; }
         .error { color: red; }
+        .form-group { margin: 1em 0; }
     </style>
 </head>
 <body>
-    <h1>Resume Analyzer for Software Developer Job Profiles</h1>
+    <h1>Resume Analyzer</h1>
     
-    <!-- Display any flash messages -->
     {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="error">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
+        {% if messages %}
+            <div class="error">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     {% endwith %}
     
     <form method="post" enctype="multipart/form-data">
-        <label for="job_profile">Select Job Profile:</label><br>
-        <select name="job_profile" id="job_profile" required>
-            {% for profile in job_profiles %}
-                <option value="{{ profile }}">{{ profile }}</option>
-            {% endfor %}
-        </select>
-        <br><br>
-        <label for="resume">Upload Resume (PDF, DOC, or TXT):</label><br>
-        <input type="file" name="resume" id="resume" accept=".pdf,.doc,.txt" required>
-        <br><br>
-        <input type="submit" value="Analyze Resume">
+        <div class="form-group">
+            <label for="job_profile">Select Job Profile:</label>
+            <select name="job_profile" id="job_profile" required>
+                {% for profile in profiles %}
+                    <option value="{{ profile }}">{{ profile }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="resume">Upload Resume (PDF, DOCX, TXT):</label>
+            <input type="file" name="resume" accept=".pdf,.docx,.txt" required>
+        </div>
+        
+        <button type="submit">Analyze</button>
     </form>
 </body>
 </html>

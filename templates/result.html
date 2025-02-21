@@ -2,31 +2,77 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Resume Analysis Result</title>
+    <title>Analysis Result</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 2em; }
-        h1, h2 { color: #333; }
-        ul { list-style-type: disc; margin-left: 20px; }
+        body { max-width: 800px; margin: 2em auto; padding: 0 1em; }
+        .skill-list { columns: 2; }
+        .suggestions { margin-top: 2em; border-top: 1px solid #ccc; padding-top: 1em; }
+        .suggestion { margin: 1em 0; }
     </style>
 </head>
 <body>
-    <h1>Analysis Result for: {{ profile }}</h1>
-    <p><strong>Match Score:</strong> {{ result.score }}%</p>
+    <h1>{{ profile }} Analysis</h1>
+    <h2>Match Score: {{ result.score }}%</h2>
     
-    <h2>Skills Matched:</h2>
-    <ul>
-        {% for skill in result.matches %}
+    <h3>Matched Skills:</h3>
+    <ul class="skill-list">
+        {% for skill in result.matches.skills %}
             <li>{{ skill }}</li>
         {% endfor %}
     </ul>
     
-    <h2>Skills Missing (Suggestions to Add):</h2>
-    <ul>
-        {% for skill in result.missing %}
+    <h3>Matched Education:</h3>
+    <ul class="skill-list">
+        {% for edu in result.matches.education %}
+            <li>{{ edu }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h3>Matched Experience:</h3>
+    <ul class="skill-list">
+        {% for exp in result.matches.experience %}
+            <li>{{ exp }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h3>Matched Certifications:</h3>
+    <ul class="skill-list">
+        {% for cert in result.matches.certifications %}
+            <li>{{ cert }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h3>Missing Skills:</h3>
+    <ul class="skill-list">
+        {% for skill in result.missing.skills %}
             <li>{{ skill }}</li>
         {% endfor %}
     </ul>
     
-    <p><a href="{{ url_for('upload_resume') }}">Analyze another resume</a></p>
+    <h3>Missing Certifications:</h3>
+    <ul class="skill-list">
+        {% for cert in result.missing.certifications %}
+            <li>{{ cert }}</li>
+        {% endfor %}
+    </ul>
+    
+    {% if suggestions %}
+    <div class="suggestions">
+        <h2>Suggested Job Profiles (Better Fit):</h2>
+        {% for suggestion in suggestions %}
+            <div class="suggestion">
+                <strong>{{ suggestion.profile }}</strong> - {{ suggestion.score }}% Match
+                <ul>
+                    <li>Skills: {{ suggestion.matches.skills }}</li>
+                    <li>Education: {{ suggestion.matches.education }}</li>
+                    <li>Experience: {{ suggestion.matches.experience }}</li>
+                    <li>Certifications: {{ suggestion.matches.certifications }}</li>
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <p><a href="/">Analyze another resume</a></p>
 </body>
 </html>
