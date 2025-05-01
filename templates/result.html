@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ profile }} Analysis Result</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-primary: #4f46e5;
+            --accent-secondary: #6366f1;
+            --match: #22c55e;
+            --mismatch: #ef4444;
+            --warning: #eab308;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent-primary);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .footer {
+            background: var(--bg-secondary);
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 1rem;
+        }
+
+        .social-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .score-card { 
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar { 
+            height: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress { 
+            height: 100%;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            transition: width 1s ease-out;
+        }
+
+        .seniority-card { 
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            background: var(--bg-secondary);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .match { 
+            border-left: 5px solid var(--match);
+            background: linear-gradient(to right, rgba(34, 197, 94, 0.1), transparent);
+        }
+
+        .mismatch { 
+            border-left: 5px solid var(--mismatch);
+            background: linear-gradient(to right, rgba(239, 68, 68, 0.1), transparent);
+        }
+
+        .partial { 
+            border-left: 5px solid var(--warning);
+            background: linear-gradient(to right, rgba(234, 179, 8, 0.1), transparent);
+        }
+
+        .pill { 
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.5rem;
+            font-weight: 500;
+            background: var(--bg-primary);
+        }
+
+        .skill-list { 
+            columns: 2;
+            margin: 1rem 0;
+            list-style-type: none;
+        }
+
+        .skill-list li {
+            background: var(--bg-secondary);
+            margin-bottom: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            break-inside: avoid;
+        }
+
+        .alternative-profiles { 
+            background: linear-gradient(to right, rgba(234, 179, 8, 0.1), transparent);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border-left: 5px solid var(--warning);
+        }
+
+        .alternative-profile {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-score {
+            background: var(--match);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .suggestions-section {
+            background: linear-gradient(to right, rgba(79, 70, 229, 0.1), transparent);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border-left: 5px solid var(--accent-primary);
+        }
+
+        .suggestion-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .suggestion-weight {
+            background: var(--accent-primary);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .suggestion-list {
+            margin: 1rem 0;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--accent-primary);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .score-indicator {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+        }
+
+        .resource-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .resource-link {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            text-decoration: none;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .resource-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .resource-link.tutorial {
+            background: rgba(79, 70, 229, 0.2);
+        }
+        
+        .resource-link.video {
+            background: rgba(220, 38, 38, 0.2);
+        }
+        
+        .resource-link.docs {
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        .resource-link.info {
+            background: rgba(59, 130, 246, 0.2);
+        }
+        
+        .resource-link.prep {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .compatibility-score {
+            font-weight: bold;
+            color: {{ '#22c55e' if result.score >= 80 else (
+                    '#eab308' if result.score >= 50 else
+                    '#ef4444'
+            ) }};
+        }
+
+        .skills-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+                
+        .skill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(79, 70, 229, 0.1) !important;
+            transition: transform 0.2s ease;
+        }
+                
+        .skill-item:hover {
+            transform: translateX(5px);
+        }
+                
+        .skill-weight {
+            font-size: 0.9em;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            background: rgba(79, 70, 229, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .education-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+                
+        .education-list {
+            list-style-type: none;
+            margin: 1rem 0;
+        }
+                
+        .education-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(79, 70, 229, 0.1);
+            margin-bottom: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+        }
+                
+        .education-item:hover {
+            transform: translateX(5px);
+        }
+                
+        .education-weight {
+            font-size: 0.9em;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            background: rgba(79, 70, 229, 0.2);
+            color: var(--text-secondary);
+        }
+                
+        .certification-item {
+            background: rgba(16, 185, 129, 0.1);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+                
+        .certification-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+                
+        .certification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+                
+        .certification-name {
+            font-weight: 500;
+        }
+                
+        .certification-impact {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--text-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.9em;
+        }
+
+        .seniority-info {
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .level-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding: 0 1rem;
+        }
+
+        .level-indicators::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .level-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .level-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 2px solid var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .level-indicator.active .level-dot {
+            background: #22c55e;
+            border-color: #22c55e;
+            transform: scale(1.2);
+        }
+
+        .level-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .level-indicator.active .level-label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .seniority-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .seniority-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .seniority-message {
+            text-align: center;
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .success-message {
+            color: #22c55e;
+        }
+
+        .warning-message {
+            color: #eab308;
+        }
+
+        .score-breakdown {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+                
+        .category-score {
+            display: grid;
+            grid-template-columns: 150px 1fr 60px;
+            align-items: center;
+            gap: 1rem;
+        }
+                
+        .category-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+                
+        .score-value {
+            text-align: right;
+            font-weight: 500;
+        }
+                
+        .progress-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+                
+        .progress {
+            height: 100%;
+            transition: width 1s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L4 7v10l8 5 8-5V7l-8-5zM8 15v-3h8v3H8z"/>
+                </svg>
+                <span class="logo-text">Resume Analyzer</span>
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="https://github.com/gauravydv001/resume_analyzer" class="nav-link" target="_blank">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h1>{{ profile }} Analysis</h1>
+            
+            <div class="score-card">
+                <h2>Overall Compatibility: <span class="compatibility-score">{{ result.score }}%</span></h2>
+                <div class="score-breakdown">
+                    <div class="category-score">
+                        <span class="category-label">Skills (40%)</span>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: {{ (result.category_scores.skills / result.category_totals.skills * 100) }}%; 
+                                background: {{ 'linear-gradient(to right, #22c55e, #16a34a)' if (result.category_scores.skills / result.category_totals.skills) >= 0.7 else
+                                           ('linear-gradient(to right, #eab308, #ca8a04)' if (result.category_scores.skills / result.category_totals.skills) >= 0.4 else
+                                            'linear-gradient(to right, #ef4444, #dc2626)') }};">
+                            </div>
+                        </div>
+                        <span class="score-value">{{ "%.1f"|format(result.category_scores.skills / result.category_totals.skills * 100) }}%</span>
+                    </div>
+                    
+                    <!-- <div class="category-score">
+                        <span class="category-label">Experience (20%)</span>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: {{ (result.category_scores.experience / result.category_totals.experience * 100) }}%;
+                                background: {{ 'linear-gradient(to right, #22c55e, #16a34a)' if (result.category_scores.experience / result.category_totals.experience) >= 0.7 else
+                                           ('linear-gradient(to right, #eab308, #ca8a04)' if (result.category_scores.experience / result.category_totals.experience) >= 0.4 else
+                                            'linear-gradient(to right, #ef4444, #dc2626)') }};">
+                            </div>
+                        </div>
+                        <span class="score-value">{{ "%.1f"|format(result.category_scores.experience / result.category_totals.experience * 100) }}%</span>
+                    </div> -->
+                    
+                    <div class="category-score">
+                        <span class="category-label">Certifications (15%)</span>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: {{ (result.category_scores.certifications / result.category_totals.certifications * 100) }}%;
+                                background: {{ 'linear-gradient(to right, #22c55e, #16a34a)' if (result.category_scores.certifications / result.category_totals.certifications) >= 0.7 else
+                                           ('linear-gradient(to right, #eab308, #ca8a04)' if (result.category_scores.certifications / result.category_totals.certifications) >= 0.4 else
+                                            'linear-gradient(to right, #ef4444, #dc2626)') }};">
+                            </div>
+                        </div>
+                        <span class="score-value">{{ "%.1f"|format(result.category_scores.certifications / result.category_totals.certifications * 100) }}%</span>
+                    </div>
+                    
+                    <div class="category-score">
+                        <span class="category-label">Education (25%)</span>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: {{ (result.category_scores.education / result.category_totals.education * 100) }}%;
+                                background: {{ 'linear-gradient(to right, #22c55e, #16a34a)' if (result.category_scores.education / result.category_totals.education) >= 0.7 else
+                                           ('linear-gradient(to right, #eab308, #ca8a04)' if (result.category_scores.education / result.category_totals.education) >= 0.4 else
+                                            'linear-gradient(to right, #ef4444, #dc2626)') }};">
+                            </div>
+                        </div>
+                        <span class="score-value">{{ "%.1f"|format(result.category_scores.education / result.category_totals.education * 100) }}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seniority-card {% if result.seniority == result.target_level %}match{% else %}mismatch{% endif %}">
+                <div class="section-header">
+                    <h2>🧑‍💼 Seniority Analysis</h2>
+                </div>
+                <div class="seniority-info">
+                    <div class="level-indicators">
+                        <div class="level-indicator {% if result.seniority == 'fresher' %}active{% endif %}">
+                            <span class="level-dot"></span>
+                            <span class="level-label">Fresher (0-2 years)</span>
+                        </div>
+                        <div class="level-indicator {% if result.seniority == 'mid' %}active{% endif %}">
+                            <span class="level-dot"></span>
+                            <span class="level-label">Mid-Level (2-5 years)</span>
+                        </div>
+                        <div class="level-indicator {% if result.seniority == 'senior' %}active{% endif %}">
+                            <span class="level-dot"></span>
+                            <span class="level-label">Senior (5+ years)</span>
+                        </div>
+                    </div>
+                    <div class="seniority-details">
+                        <div class="seniority-stat">
+                            <span class="stat-label">Your Level:</span>
+                            <span class="stat-value" style="color: {{ '#22c55e' if result.seniority == result.target_level else '#ef4444' }}">
+                                {{ result.seniority|title }}
+                            </span>
+                        </div>
+                        <div class="seniority-stat">
+                            <span class="stat-label">Target Level:</span>
+                            <span class="stat-value" style="color: #6366f1;">{{ result.target_level|title }}</span>
+                        </div>
+                        <div class="seniority-stat">
+                            <span class="stat-label">Experience:</span>
+                            <span class="stat-value">{{ result.exp_years }} years</span>
+                        </div>
+                    </div>
+                    <div class="seniority-message">
+                        {% if result.seniority == result.target_level %}
+                            <p class="success-message">✅ Your seniority level perfectly matches the role requirements!</p>
+                        {% else %}
+                            <p class="warning-message">
+                                ⚠️ Your seniority level differs from the target level. 
+                                {% if result.seniority == 'fresher' and result.target_level == 'mid' %}
+                                    Consider gaining more experience or highlighting relevant projects.
+                                {% elif result.seniority == 'senior' and result.target_level == 'mid' %}
+                                    You might be overqualified for this role.
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <section class="skills-section">
+                <div class="section-header">
+                    <h3>🔧 Skills Matched</h3>
+                    <span class="score-indicator" style="background: {{ 
+                        'rgba(34, 197, 94, 0.2)' if (result.category_scores.skills / result.category_totals.skills) >= 0.7 else (
+                        'rgba(234, 179, 8, 0.2)' if (result.category_scores.skills / result.category_totals.skills) >= 0.4 else
+                        'rgba(239, 68, 68, 0.2)') }};">
+                        {{ result.category_scores.skills }}/{{ result.category_totals.skills }}
+                    </span>
+                </div>
+                <ul class="skill-list">
+                    {% for skill in result.matches.skills %}
+                        <li class="skill-item">
+                            <span class="skill-name">{{ skill }}</span>
+                            <span class="skill-weight">Weight: {{ job_profile_keywords[profile]['skills'][skill] }}/5</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="education-section">
+                <div class="section-header">
+                    <h3>📚 Education Matched</h3>
+                    <span class="score-indicator" style="background: {{ 
+                        'rgba(34, 197, 94, 0.2)' if (result.category_scores.education / result.category_totals.education) >= 0.7 else (
+                        'rgba(234, 179, 8, 0.2)' if (result.category_scores.education / result.category_totals.education) >= 0.4 else
+                        'rgba(239, 68, 68, 0.2)') }};">
+                        {{ "%.1f"|format(result.category_scores.education|float) }}/{{ "%.1f"|format(result.category_totals.education|float) }}
+                    </span>
+                </div>
+                <ul class="education-list">
+                    {% for edu in result.matches.education %}
+                        <li class="education-item">
+                            <span class="education-name">{{ edu }}</span>
+                            <span class="education-weight">Weight: {{ job_profile_keywords[profile]['education'][edu] }}/5</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            {% if show_missing_experience %}
+            <section>
+                <div class="section-header">
+                    <h3>⚠️ Missing Experience</h3>
+                </div>
+                <ul class="skill-list">
+                    {% for exp in job_profile_keywords[profile]['experience'].keys() %}
+                        {% if exp not in result.matches.experience %}
+                            <li>{{ exp }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+
+            {% if alternative_profiles %}
+            <div class="alternative-profiles">
+                <h2>🎯 Better Profile Matches</h2>
+                <p>Based on your resume, you might be a better fit for these roles:</p>
+                {% for profile_name, score in alternative_profiles.items() %}
+                <div class="alternative-profile">
+                    <span>{{ profile_name }}</span>
+                    <span class="profile-score">{{ score }}% Match</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if result.suggestions %}
+            <div class="suggestions-section">
+                <h2>🚀 Improve Your Resume</h2>
+                
+                {% if result.suggestions.skills %}
+                <h3>💡 Recommended Skills to Learn</h3>
+                <p>Based on your profile, these skills would make you a stronger candidate:</p>
+                <div class="suggestion-list">
+                    {% for skill, weight, resources in result.suggestions.skills %}
+                    <div class="suggestion-item">
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>{{ skill }}</span>
+                                <span class="suggestion-weight">Priority: {{ weight }}/5</span>
+                            </div>
+                            <div class="resource-links">
+                                {% if resources.tutorial %}
+                                <a href="{{ resources.tutorial }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="resource-link tutorial">
+                                    📚 Tutorial
+                                </a>
+                                {% endif %}
+                                {% if resources.video_course %}
+                                <a href="{{ resources.video_course }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="resource-link video">
+                                    📺 Video Course
+                                </a>
+                                {% endif %}
+                                {% if resources.documentation %}
+                                <a href="{{ resources.documentation }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="resource-link docs">
+                                    📖 Documentation
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if result.suggestions.certifications %}
+                <h3>🏆 Recommended Certifications</h3>
+                <p>These certifications would enhance your qualifications:</p>
+                <div class="suggestion-list">
+                    {% for cert, weight, resources in result.suggestions.certifications %}
+                    <div class="suggestion-item">
+                        <div style="flex: 1;">
+                            <div class="certification-header">
+                                <span class="certification-name">{{ cert }}</span>
+                                <span class="certification-impact">Impact: {{ weight }}/5</span>
+                            </div>
+                            <div class="resource-links">
+                                {% if resources.info %}
+                                <a href="{{ resources.info }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="resource-link info">
+                                    ℹ️ Certification Info
+                                </a>
+                                {% endif %}
+                                {% if resources.preparation %}
+                                <a href="{{ resources.preparation }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="resource-link prep">
+                                    📝 Preparation Resources
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <p style="margin-top: 20px; font-style: italic; color: var(--text-secondary);">
+                    Note: Priority/Impact scores indicate how valuable these additions would be for this role (5 being highest).
+                </p>
+            </div>
+            {% endif %}
+
+            <a href="/" class="back-button">Analyze Another Resume</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="#" class="social-link">Twitter</a>
+                <a href="#" class="social-link">LinkedIn</a>
+                <a href="https://github.com/gauravydv001/resume_analyzer" class="social-link">GitHub</a>
+            </div>
+            <div class="footer-text">
+                <p>© 2025 Resume Analyzer. Helping you match the perfect job.</p>
+                <p>Built with ❤️ for developers</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,8 @@
+Flask==2.0.3
+Werkzeug==2.0.3
+PyPDF2==3.0.1
+python-docx==0.8.11
+flask-vercel==0.4.4
+spacy==3.5.3
+python-Levenshtein==0.21.1
+fuzzywuzzy==0.18.0
