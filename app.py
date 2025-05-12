@@ -131,8 +131,8 @@ class ResumeAnalyzer:
 
         # Education variations mapping
         self.education_variations = {
-            "MCA": ["Master in Computer Application", "Masters in Computer Application", "Master of Computer Application", "Masters of Computer Application", "M.C.A", "M.C.A.", "MCA"],
-            "BCA": ["Bachelor in Computer Application", "Bachelors in Computer Application", "Bachelor of Computer Application", "Bachelors of Computer Application", "B.C.A", "B.C.A.", "BCA"],
+            "MCA": ["Master in Computer Application", "Masters in Computer Application", "Master of Computer Application", "Masters of Computer Application", "M.C.A", "M.C.A.", "MCA","Masters of Computer Applications"],
+            "BCA": ["Bachelor in Computer Application", "Bachelors in Computer Application", "Bachelor of Computer Application", "Bachelors of Computer Application", "B.C.A", "B.C.A.", "BCA","Bachelors of Computer Applications"],
             "B.Tech in Computer Science": ["Bachelor of Technology in Computer Science", "B.Tech Computer Science", "B.Tech CS", "B.Tech. CS", "BTech CS", "Bachelor of Technology CS"],
             "M.Tech in Software Engineering": ["Master of Technology in Software Engineering", "M.Tech Software Engineering", "M.Tech SE", "MTech SE", "Master in Software Engineering"]
         }
